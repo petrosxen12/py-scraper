@@ -61,12 +61,18 @@ soup = BeautifulSoup(website_source.text, 'html.parser')
 links = []
 for link in soup.find_all('a'):
     href = link.get('href')
-    if is_valid_link(href):
-        print(href)
-        links.append(href)
+    # if is_valid_link(href):
+    #     print(href)
+    #     links.append(href)
+    if href is not None and href[0] != '/':
+        continue
+    links.append(href)
 
 
 # Print the links
-for link in links:
+for link in set(links):
+    if "privacy-policy" in str(link):
+        print(f"!!!----- {link}")
     print(link)
+
 
