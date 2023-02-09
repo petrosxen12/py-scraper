@@ -100,6 +100,8 @@ def scrape_text_privacy_policy(website, priv_policy_link):
 
     return text
 
+# For debbugging purposes
+
 
 def is_valid_link(lnk):
     if lnk is None:
@@ -146,13 +148,15 @@ if __name__ == "__main__":
 
         external_content.add(c)
 
-    # for i, c in enumerate(external_content):
-    #     print(f"{i+1} -- {c}")
+    for i, c in enumerate(external_content):
+        print(f"{i+1} -- {c}")
 
     custom_logger.debug(f"External loaded content: {external_content}")
-    custom_logger.info(f"External loaded content: {external_content}")
+    # custom_logger.info(f"External loaded content: {external_content}")
 
     write_data_to_json_file(external_content, EXTERNAL_CONTENT_FILE)
+
+# -------- Privacy Policy Scraping
 
     # Parse the HTML content of the website
     soup = BeautifulSoup(website_source.text, 'html.parser')
@@ -186,6 +190,6 @@ if __name__ == "__main__":
 
     word_count = count_words(text)
 
-    custom_logger.info(f"Word count of privacy policy: {word_count}")
+    custom_logger.debug(f"Word count of privacy policy: {word_count}")
 
     write_data_to_json_file(word_count, WORD_COUNT_FILE)
