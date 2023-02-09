@@ -2,6 +2,20 @@ import argparse
 import re
 
 import requests
+from bs4 import BeautifulSoup
+
+
+def is_valid_link(lnk):
+    if lnk is None:
+        return False 
+
+    try: 
+        res = requests.get(website + lnk, timeout=3)
+        if res.status_code == 200:
+            return True
+        return False
+    except requests.exceptions.InvalidURL:
+        return False
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--website', help='The website to be scraped')
@@ -39,3 +53,20 @@ for cont in content:
 
 for i, c in enumerate(external_content):
     print(f"{i+1} -- {c}")
+
+# Parse the HTML content of the website
+soup = BeautifulSoup(website_source.text, 'html.parser')
+    
+# Find all the hyperlinks
+links = []
+for link in soup.find_all('a'):
+    href = link.get('href')
+    if is_valid_link(href):
+        print(href)
+        links.append(href)
+
+
+# Print the links
+for link in links:
+    print(link)
+
