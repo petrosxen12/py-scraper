@@ -1,5 +1,6 @@
 import argparse
 import re
+from collections import Counter
 
 import requests
 from bs4 import BeautifulSoup
@@ -15,15 +16,11 @@ def count_words(text):
     # Split the text into words
     words = text.split()
 
-    # Count the occurrences of each word
-    word_counts = {}
-    for word in words:
-        if word in word_counts:
-            word_counts[word] += 1
-        else:
-            word_counts[word] = 1
+    # Count the occurrences of each word using the Counter class from the collections module
+    # which is more efficiennt than looping
+    word_counts = Counter(words)
 
-    return word_counts
+    return dict(word_counts)
 
 
 def get_website_contents(url):
