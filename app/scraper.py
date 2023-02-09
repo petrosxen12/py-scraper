@@ -1,41 +1,68 @@
 import argparse
+import logging
 import re
 from collections import Counter
+import sys
 
 import requests
 from bs4 import BeautifulSoup
 
 
-def count_words(text):
-    # Convert the text to lowercase
-    text = text.lower()
+def get_logger(name, level=logging.INFO):
+    loggerius = logging.getLogger(name)
+    loggerius.setLevel(level)
+    logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    return loggerius
+
+
+custom_logger = get_logger(__name__)
+
+
+def count_words(body_words):
+    # Convert the body_words to lowercase
+    body_words = body_words.lower()
+
+    custom_logger.debug(body_words)
 
     # Remove all non-alphanumeric characters
-    text = re.sub(r'[^a-z0-9]+', ' ', text)
+    body_words = re.sub(r'[^a-z0-9]+', ' ', body_words)
 
     # Split the text into words
-    words = text.split()
+    words = body_words.split()
 
     # Count the occurrences of each word using the Counter class from the collections module
     # which is more efficiennt than looping
     word_counts = Counter(words)
 
+    # type: ignore
     return dict(word_counts)
 
 
 def get_website_contents(url):
     try:
+        logging.info(f"Getting website contents for {url}")
+
         website_contents = requests.get(url, timeout=5)
 
+        custom_logger.debug(website_contents)
+
     except ValueError as err:
-        print(f"Error scraping website due to {err}")
-        exit()
+        custom_logger.error(f"Error scraping website due to {err}")
+        sys.exit()
 
     return website_contents
 
 
 def scrape_text_privacy_policy(website, priv_policy_link):
+
+    custom_logger.info(
+        f"Scraping privacy policy for {website} in link {priv_policy_link}")
+
     privacy_policy_source = get_website_contents(website + priv_policy_link)
+
+    custom_logger.info("Site contents succesfully scraped")
 
     # Parse the HTML content of the website
     soup = BeautifulSoup(privacy_policy_source.text, 'html.parser')
@@ -46,11 +73,14 @@ def scrape_text_privacy_policy(website, priv_policy_link):
 
     # Get the visible text
     text = soup.get_text()
+    custom_logger.debug(text)
 
     # Remove all non-visible characters
     text = re.sub(r'[\n\r\t]+', ' ', text)
     text = re.sub(r'\s+', ' ', text)
     text = text.strip()
+
+    custom_logger.debug(f"Cleaned text: {text}")
 
     return text
 
@@ -77,6 +107,8 @@ if __name__ == "__main__":
 
     website_source = get_website_contents(website)
 
+    custom_logger.info(f"Finding all external loaded sources from {website}")
+
     # Find all externally loaded sources i.e. images/scripts/fonts not hosted on *website* to be scraped
     # These are any html which includes an "=http(s)://" which means loads something (anything) external
     externally_loaded_regex = r"=\"(http[s]*://([\w*].*))\"(.?)"
@@ -98,8 +130,10 @@ if __name__ == "__main__":
 
         external_content.add(c)
 
-    for i, c in enumerate(external_content):
-        print(f"{i+1} -- {c}")
+    # for i, c in enumerate(external_content):
+    #     print(f"{i+1} -- {c}")
+
+    custom_logger.debug(f"External loaded content: {external_content}")
 
     # Parse the HTML content of the website
     soup = BeautifulSoup(website_source.text, 'html.parser')
@@ -123,13 +157,14 @@ if __name__ == "__main__":
     for link in set(links):
         if "privacy-policy" in str(link):
             privacy_policy = str(link)
-            print(f"!!!----- {link}")
-        print(link)
+            custom_logger.info(f"Privacy policy at {link}")
+
+        custom_logger.debug(link)
 
     text = scrape_text_privacy_policy(website, privacy_policy)
 
-    print(text)
+    custom_logger.debug(text)
 
     word_count = count_words(text)
 
-    print(word_count)
+    custom_logger.info(f"Word count of privacy policy: {word_count}")
