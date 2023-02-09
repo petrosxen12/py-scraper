@@ -3,9 +3,14 @@ import logging
 import re
 from collections import Counter
 import sys
+import json
 
 import requests
 from bs4 import BeautifulSoup
+
+# env variables for filennames
+EXTERNAL_CONTENT_FILE = "content_file.json"
+WORD_COUNT_FILE = "word_count_file.json"
 
 
 def get_logger(name, level=logging.INFO):
@@ -18,6 +23,17 @@ def get_logger(name, level=logging.INFO):
 
 
 custom_logger = get_logger(__name__)
+
+
+def write_data_to_json_file(data, file_path):
+    # Needed for converting set to JSON serialazable object
+    def set_default(obj):
+        if isinstance(obj, set):
+            return list(obj)
+        raise TypeError
+
+    with open(file_path, 'w') as json_file:
+        json.dump(data, json_file, indent=4, default=set_default)
 
 
 def count_words(body_words):
@@ -134,6 +150,9 @@ if __name__ == "__main__":
     #     print(f"{i+1} -- {c}")
 
     custom_logger.debug(f"External loaded content: {external_content}")
+    custom_logger.info(f"External loaded content: {external_content}")
+
+    write_data_to_json_file(external_content, EXTERNAL_CONTENT_FILE)
 
     # Parse the HTML content of the website
     soup = BeautifulSoup(website_source.text, 'html.parser')
@@ -168,3 +187,5 @@ if __name__ == "__main__":
     word_count = count_words(text)
 
     custom_logger.info(f"Word count of privacy policy: {word_count}")
+
+    write_data_to_json_file(word_count, WORD_COUNT_FILE)
