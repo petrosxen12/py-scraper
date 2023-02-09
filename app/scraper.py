@@ -4,6 +4,30 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
+def scrape_text_privacy_policy():
+    try:
+        privacy_policy_source = requests.get(website + privacy_policy, timeout=5)
+
+    except ValueError as err:
+        print(f"Error scraping website due to {err}")
+        exit()
+
+    # Parse the HTML content of the website
+    soup = BeautifulSoup(privacy_policy_source.text, 'html.parser')
+
+    # Remove scripts and styles
+    for element in soup(["script", "style"]):
+        element.extract()
+
+    # Get the visible text
+    text = soup.get_text()
+
+    # Remove all non-visible characters
+    text = re.sub(r'[\n\r\t]+', ' ', text)
+    text = re.sub(r'\s+', ' ', text)
+    text = text.strip()
+
+    return text
 
 def is_valid_link(lnk):
     if lnk is None:
@@ -24,7 +48,7 @@ args = parser.parse_args()
 website = args.website
 
 try:
-    website_source = requests.get(website)
+    website_source = requests.get(website, timeout=5)
 except ValueError as e:
     print("Error scraping website")
     exit()
@@ -61,18 +85,25 @@ soup = BeautifulSoup(website_source.text, 'html.parser')
 links = []
 for link in soup.find_all('a'):
     href = link.get('href')
+    
+    # Debug
     # if is_valid_link(href):
     #     print(href)
     #     links.append(href)
+
     if href is not None and href[0] != '/':
         continue
     links.append(href)
 
 
-# Print the links
+# Print the links and get privacy policy
+privacy_policy = ""
 for link in set(links):
     if "privacy-policy" in str(link):
+        privacy_policy = str(link)
         print(f"!!!----- {link}")
     print(link)
 
+text = scrape_text_privacy_policy()
 
+print(text)
