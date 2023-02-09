@@ -5,6 +5,27 @@ import requests
 from bs4 import BeautifulSoup
 
 
+def count_words(text):
+    # Convert the text to lowercase
+    text = text.lower()
+
+    # Remove all non-alphanumeric characters
+    text = re.sub(r'[^a-z0-9]+', ' ', text)
+
+    # Split the text into words
+    words = text.split()
+
+    # Count the occurrences of each word
+    word_counts = {}
+    for word in words:
+        if word in word_counts:
+            word_counts[word] += 1
+        else:
+            word_counts[word] = 1
+
+    return word_counts
+
+
 def get_website_contents(url):
     try:
         website_contents = requests.get(url, timeout=5)
@@ -111,3 +132,7 @@ if __name__ == "__main__":
     text = scrape_text_privacy_policy(website, privacy_policy)
 
     print(text)
+
+    word_count = count_words(text)
+
+    print(word_count)
