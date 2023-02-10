@@ -1,9 +1,10 @@
 import argparse
+import json
 import logging
 import re
-from collections import Counter
 import sys
-import json
+from collections import Counter
+from os import getenv
 
 import requests
 from bs4 import BeautifulSoup
@@ -11,9 +12,21 @@ from bs4 import BeautifulSoup
 # env variables for filennames
 EXTERNAL_CONTENT_FILE = "content_file.json"
 WORD_COUNT_FILE = "word_count_file.json"
+ENVIRONMENT = "prod"
 
 
-def get_logger(name, level=logging.INFO):
+def logging_level(environment):
+    if environment == "dev":
+        return logging.DEBUG
+
+    if environment == "prod":
+        return logging.INFO
+
+
+def get_logger(name):
+
+    level = logging_level(ENVIRONMENT)
+
     loggerius = logging.getLogger(name)
     loggerius.setLevel(level)
     logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -102,8 +115,6 @@ def scrape_text_privacy_policy(website, priv_policy_link):
 
 
 # For debbugging purposes
-
-
 def is_valid_link(lnk):
     if lnk is None:
         return False
@@ -194,12 +205,12 @@ if __name__ == "__main__":
 
         custom_logger.debug(link)
 
-    text = scrape_text_privacy_policy(website, privacy_policy)
+    if privacy_policy == "":
+        custom_logger.warning("Privacy policy not found, did not write to file")
+    else:
+        text = scrape_text_privacy_policy(website, privacy_policy)
+        custom_logger.debug(text)
+        word_count = count_words(text)
+        custom_logger.debug(f"Word count of privacy policy: {word_count}")
 
-    custom_logger.debug(text)
-
-    word_count = count_words(text)
-
-    custom_logger.debug(f"Word count of privacy policy: {word_count}")
-
-    write_data_to_json_file(word_count, WORD_COUNT_FILE)
+        write_data_to_json_file(word_count, WORD_COUNT_FILE)
