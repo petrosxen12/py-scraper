@@ -118,7 +118,8 @@ def is_valid_link(lnk):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--website', help='The website to be scraped in the format http(s)://www.example.com')
+    parser.add_argument(
+        '--website', help='The website to be scraped in the format http(s)://www.example.com')
     args = parser.parse_args()
 
     website = args.website
