@@ -16,8 +16,7 @@ WORD_COUNT_FILE = "word_count_file.json"
 def get_logger(name, level=logging.INFO):
     loggerius = logging.getLogger(name)
     loggerius.setLevel(level)
-    logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     return loggerius
 
@@ -32,7 +31,7 @@ def write_data_to_json_file(data, file_path):
             return list(obj)
         raise TypeError
 
-    with open(file_path, 'w') as json_file:
+    with open(file_path, "w") as json_file:
         json.dump(data, json_file, indent=4, default=set_default)
 
 
@@ -43,7 +42,7 @@ def count_words(body_words):
     custom_logger.debug(body_words)
 
     # Remove all non-alphanumeric characters
-    body_words = re.sub(r'[^a-z0-9]+', ' ', body_words)
+    body_words = re.sub(r"[^a-z0-9]+", " ", body_words)
 
     # Split the text into words
     words = body_words.split()
@@ -64,7 +63,7 @@ def get_website_contents(url):
 
         custom_logger.debug(website_contents)
 
-    except ValueError as err:
+    except Exception as err:
         custom_logger.error(f"Error scraping website due to {err}")
         sys.exit()
 
@@ -74,14 +73,15 @@ def get_website_contents(url):
 def scrape_text_privacy_policy(website, priv_policy_link):
 
     custom_logger.info(
-        f"Scraping privacy policy for {website} in link {priv_policy_link}")
+        f"Scraping privacy policy for {website} in link {priv_policy_link}"
+    )
 
     privacy_policy_source = get_website_contents(website + priv_policy_link)
 
     custom_logger.info("Site contents succesfully scraped")
 
     # Parse the HTML content of the website
-    soup = BeautifulSoup(privacy_policy_source.text, 'html.parser')
+    soup = BeautifulSoup(privacy_policy_source.text, "html.parser")
 
     # Remove scripts and styles
     for element in soup(["script", "style"]):
@@ -92,13 +92,14 @@ def scrape_text_privacy_policy(website, priv_policy_link):
     custom_logger.debug(text)
 
     # Remove all non-visible characters
-    text = re.sub(r'[\n\r\t]+', ' ', text)
-    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r"[\n\r\t]+", " ", text)
+    text = re.sub(r"\s+", " ", text)
     text = text.strip()
 
     custom_logger.debug(f"Cleaned text: {text}")
 
     return text
+
 
 # For debbugging purposes
 
@@ -119,10 +120,18 @@ def is_valid_link(lnk):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--website', help='The website to be scraped in the format http(s)://www.example.com')
+        "--website",
+        help="The website to be scraped in the format http(s)://www.example.com",
+    )
     args = parser.parse_args()
 
     website = args.website
+
+    if website is None:
+        custom_logger.error(
+            "Website name not valid, please try one in the format http(s)://www.example.com/"
+        )
+        sys.exit()
 
     website_source = get_website_contents(website)
 
@@ -157,22 +166,22 @@ if __name__ == "__main__":
 
     write_data_to_json_file(external_content, EXTERNAL_CONTENT_FILE)
 
-# -------- Privacy Policy Scraping
+    # -------- Privacy Policy Scraping
 
     # Parse the HTML content of the website
-    soup = BeautifulSoup(website_source.text, 'html.parser')
+    soup = BeautifulSoup(website_source.text, "html.parser")
 
     # Find all the hyperlinks
     links = []
-    for link in soup.find_all('a'):
-        href = link.get('href')
+    for link in soup.find_all("a"):
+        href = link.get("href")
 
         # Debug
         # if is_valid_link(href):
         #     print(href)
         #     links.append(href)
 
-        if href is not None and href[0] != '/':
+        if href is not None and href[0] != "/":
             continue
         links.append(href)
 
