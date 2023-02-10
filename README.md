@@ -17,4 +17,4 @@ You can change the env variable to "dev" for more thorough logs like so:
 
 ##Running tests:
 - Install `pytest`
-- Run `pytest` and the tests should run :) 
+- Run `python3 -m pytest` and the tests should run :) 
