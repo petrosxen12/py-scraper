@@ -14,3 +14,7 @@ The docker container should output two files in the `app/` directory:
 ## For debubgging:
 You can change the env variable to "dev" for more thorough logs like so:
 `docker run python-scraper -env ENVIRONMENT="dev" --website http(s)://www.<anywebsite>.com/`
+
+##Running tests:
+- Install `pytest`
+- Run `pytest` and the tests should run :) 
