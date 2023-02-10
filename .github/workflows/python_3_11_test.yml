@@ -18,7 +18,7 @@ jobs:
           python-version: 3.11
 
       - name: Install dependencies
-        working-directory: ./app
+        working-directory: ./app/
         run: |
           python -m venv env
           source env/bin/activate
@@ -27,4 +27,5 @@ jobs:
 
       - name: Run tests
         run: |
+          # pip install pytest requests
           python -m pytest
