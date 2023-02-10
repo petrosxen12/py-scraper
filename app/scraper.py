@@ -203,7 +203,7 @@ if __name__ == "__main__":
             privacy_policy = str(link)
             custom_logger.info(f"Privacy policy at {link}")
 
-        custom_logger.debug(link)
+    custom_logger.debug(links)
 
     if privacy_policy == "":
         custom_logger.warning("Privacy policy not found, did not write to file")
