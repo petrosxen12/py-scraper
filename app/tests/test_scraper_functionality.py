@@ -1,13 +1,29 @@
+import os
 import re
+import sys
 
 import pytest
+import json
+
 import requests
-from scraper import (
+
+from app.scraper import (
     count_words,
     get_website_contents,
     scrape_text_privacy_policy,
     write_data_to_json_file,
 )
+
+# # Get the directory of the current script
+# current_script_dir = os.path.dirname(os.path.realpath("scraper.py"))
+# print(current_script_dir)
+
+# # Construct the path to the scraper_module directory
+# # scraper_module_path = os.path.join(current_script_dir, "scraper.py")
+# print(current_script_dir)
+
+# # Append the scraper_module directory to sys.path
+# sys.path.append(current_script_dir)
 
 
 def test_write_data_to_json_file():
