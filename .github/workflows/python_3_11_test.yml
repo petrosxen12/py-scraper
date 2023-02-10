@@ -18,10 +18,11 @@ jobs:
           python-version: 3.11
 
       - name: Install dependencies
+        working-directory: ./app
         run: |
           python -m venv env
           source env/bin/activate
-          pip install -r app/requirements.txt
+          pip install -r requirements.txt
 
       - name: Run tests
         run: |

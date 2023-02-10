@@ -1,3 +1,4 @@
 beautifulsoup4==4.11.1
 requests==2.28.2
 urllib3==1.26.14
+pytest==5.3.5
