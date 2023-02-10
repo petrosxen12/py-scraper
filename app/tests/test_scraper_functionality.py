@@ -2,10 +2,10 @@ import os
 import re
 import sys
 
-import pytest
 import json
 
 import requests
+from unittest.mock import patch
 
 from app.scraper import (
     count_words,
@@ -13,17 +13,6 @@ from app.scraper import (
     scrape_text_privacy_policy,
     write_data_to_json_file,
 )
-
-# # Get the directory of the current script
-# current_script_dir = os.path.dirname(os.path.realpath("scraper.py"))
-# print(current_script_dir)
-
-# # Construct the path to the scraper_module directory
-# # scraper_module_path = os.path.join(current_script_dir, "scraper.py")
-# print(current_script_dir)
-
-# # Append the scraper_module directory to sys.path
-# sys.path.append(current_script_dir)
 
 
 def test_write_data_to_json_file():
@@ -48,53 +37,54 @@ def test_get_website_contents():
     assert result.status_code == 200
 
 
-def test_scrape_text_privacy_policy(mocker):
+def test_scrape_text_privacy_policy():
     # Mocking the requests.get() method
-    mocker.patch("requests.get")
-    requests.get.return_value.text = "<html><body>Test Body</body></html>"
+    with patch("requests.get") as mocked_requests_get:
+        mocked_requests_get.return_value.text = "<html><body>Test Body</body></html>"
+        # requests.get.return_value.text =
 
-    website = "http://www.example.com"
-    priv_policy_link = "/privacy-policy"
-    result = scrape_text_privacy_policy(website, priv_policy_link)
+        website = "http://www.example.com"
+        priv_policy_link = "/privacy-policy"
+        result = scrape_text_privacy_policy(website, priv_policy_link)
 
     # Asserting that the correct text is returned after removing scripts and styles
     assert result == "Test Body"
 
 
-def test_scrape_text_privacy_policy_no_scripts_and_styles(mocker):
+def test_scrape_text_privacy_policy_no_scripts_and_styles():
     # Mocking the requests.get() method
-    mocker.patch("requests.get")
-    requests.get.return_value.text = "<html><body><script>Test Script</script><style>Test Style</style>Test Body</body></html>"
+    with patch("requests.get") as mocked_requests_get:
+        mocked_requests_get.return_value.text = "<html><body><script>Test Script</script><style>Test Style</style>Test Body</body></html>"
 
-    website = "http://www.example.com"
-    priv_policy_link = "/privacy-policy"
-    result = scrape_text_privacy_policy(website, priv_policy_link)
+        website = "http://www.example.com"
+        priv_policy_link = "/privacy-policy"
+        result = scrape_text_privacy_policy(website, priv_policy_link)
 
     # Asserting that scripts and styles are removed
     assert result == "Test Body"
 
 
-def test_scrape_text_privacy_policy_new_lines_and_tabs(mocker):
+def test_scrape_text_privacy_policy_new_lines_and_tabs():
     # Mocking the requests.get() method
-    mocker.patch("requests.get")
-    requests.get.return_value.text = "<html><body>Test Body\n\r\t</body></html>"
+    with patch("requests.get") as mocked_requests_get:
+        mocked_requests_get.return_value.text = "<html><body>Test Body\n\r\t</body></html>"
 
-    website = "http://www.example.com"
-    priv_policy_link = "/privacy-policy"
-    result = scrape_text_privacy_policy(website, priv_policy_link)
+        website = "http://www.example.com"
+        priv_policy_link = "/privacy-policy"
+        result = scrape_text_privacy_policy(website, priv_policy_link)
 
     # Asserting that new lines and tabs are removed
     assert result == "Test Body"
 
 
-def test_scrape_text_privacy_policy_multiple_spaces(mocker):
+def test_scrape_text_privacy_policy_multiple_spaces():
     # Mocking the requests.get() method
-    mocker.patch("requests.get")
-    requests.get.return_value.text = "<html><body>Test    Body</body></html>"
+    with patch("requests.get") as mocked_requests_get:
+        mocked_requests_get.return_value.text = "<html><body>Test    Body</body></html>"
 
-    website = "http://www.example.com"
-    priv_policy_link = "/privacy-policy"
-    result = scrape_text_privacy_policy(website, priv_policy_link)
+        website = "http://www.example.com"
+        priv_policy_link = "/privacy-policy"
+        result = scrape_text_privacy_policy(website, priv_policy_link)
 
     # Asserting that multiple spaces are removed
     assert result == "Test Body"
