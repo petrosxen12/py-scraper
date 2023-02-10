@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 # env variables for filennames
 EXTERNAL_CONTENT_FILE = "content_file.json"
 WORD_COUNT_FILE = "word_count_file.json"
-ENVIRONMENT = "prod"
+ENVIRONMENT = getenv("ENVIRONMENT")
 
 
 def logging_level(environment):
@@ -21,6 +21,9 @@ def logging_level(environment):
 
     if environment == "prod":
         return logging.INFO
+
+    else:
+        return logging.DEBUG
 
 
 def get_logger(name):
